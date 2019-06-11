@@ -76,11 +76,11 @@ def main():
                     print(value)
                     
                 # populate the songs array
-                if key == "album_names":
-                    song_info["album_name"] = value
-                elif key == "playlist":
+                if key == "playlist":
                     song_info["playlist_name"] = value
-                else:
+                # elif key == "album_names":
+                #     song_info["album_name"] = value
+                elif key not in ["artist_name", "album_names"]:
                     song_info[key] = value
                 
                 # populate the playlist array
@@ -107,9 +107,9 @@ def main():
 
         # export the json
         with open("dataProcessed.json", 'w', encoding='utf-8') as f:
-            json.dump(resultList, f, indent=4, sort_keys=True)
+            json.dump(resultList, f, sort_keys=True)
         with open("dataRaw.json", 'w', encoding='utf-8') as f:
-            json.dump(songsList, f, indent=4, sort_keys=True)
+            json.dump(songsList, f, sort_keys=True)
 
 if __name__ == "__main__":
 	 main()

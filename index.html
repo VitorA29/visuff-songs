@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>VisUFF</title>
+        <script src="https://cdn.jsdelivr.net/npm/vega@5.4.0"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vega-lite@3.3.0"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vega-embed@4.2.0"></script>
+    </head>
+    <body>
+        <div id="vis"></div>
+
+        <script type="text/javascript">
+            let interestingColumn = [
+                'acousticness',
+                'danceability',
+                'energy',
+                'instrumentalness',
+                'liveness',
+                'speechiness',
+                'audio_valence'
+            ];
+            let revertedColumn = interestingColumn.slice(0);
+            revertedColumn.reverse();
+
+            let columnTranslation = {
+                'acousticness': 'Grau acústico',
+                'danceability': 'Grau dançante',
+                'energy': 'Grau energético',
+                'instrumentalness': 'Grau instrumental',
+                'liveness': 'Grau ao vivo',
+                'speechiness': 'Grau de palavras',
+                'audio_valence': 'Grau emocional'
+            };
+
+            let acceptPlaylist = [ 'Adrenaline Workout', 'Acoustic Hits', 'Acoustic Covers' ]
+
+            let VlSpec = {
+                data: {url: 'dataset/dataRaw.json'},
+                transform: [
+                    {filter: {field: 'playlist_name', oneOf: acceptPlaylist}}
+                ],
+                repeat:{
+                    row: interestingColumn,
+                    column: revertedColumn
+                },
+                spec:{
+                    mark: 'circle',
+                    encoding: {
+                        x: {
+                            field: {repeat: 'column'},
+                            type: 'quantitative',
+                            bin: true,
+                            axis: {
+                                title: columnTranslation[{repeat: 'column'}],
+                                grid: {
+                                    grid: true
+                                }
+                            }
+                        },
+                        y: {
+                            field: {repeat: 'row'},
+                            type: 'quantitative',
+                            bin: true,
+                            axis: {
+                                title: columnTranslation[{repeat: 'row'}],
+                                grid: {
+                                    grid: true
+                                }
+                            }
+                        },
+                        color: {
+                            field: 'playlist_name',
+                            type: 'nominal'
+                        }
+                    }
+                }
+            };
+            vegaEmbed('#vis', VlSpec);
+          </script>
+    </body>
+</html>
