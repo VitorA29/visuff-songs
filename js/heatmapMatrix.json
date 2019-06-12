@@ -1,0 +1,50 @@
+{
+    "repeat":{
+        "row": [
+            "acousticness",
+            "danceability",
+            "energy",
+            "instrumentalness",
+            "liveness",
+            "speechiness",
+            "audio_valence"
+        ],
+        "column": [
+            "audio_valence",
+            "speechiness",
+            "liveness",
+            "instrumentalness",
+            "energy",
+            "danceability",
+            "acousticness"
+        ]
+    },
+    "spec":{
+        "mark": "rect",
+        "encoding": {
+            "x": {
+                "field": {"repeat": "column"},
+                "type": "quantitative",
+                "bin": {
+                    "extent": [0, 1],
+                    "step": 0.1
+                }
+            },
+            "y": {
+                "field": {"repeat": "row"},
+                "type": "quantitative",
+                "bin": {
+                    "extent": [0, 1],
+                    "step": 0.1
+                }
+            }
+        }
+    },
+    "config": {
+        "axis": {
+            "grid": {
+                "grid": true
+            }
+        }
+    }
+}

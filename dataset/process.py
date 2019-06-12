@@ -38,6 +38,7 @@ def main():
         # create the result dict
         result = dict()
         songsList = list()
+        playlistList = dict()
         for row in table:
             # get the playlist node
             if row["playlist"] not in result:
@@ -45,6 +46,11 @@ def main():
                 result[row["playlist"]]["playlist_name"] = row["playlist"]
                 result[row["playlist"]]["artistsD"] = dict()
             playlist = result[row["playlist"]]
+
+            # get the playlist songs array
+            if row["playlist"] not in playlistList:
+                playlistList[row["playlist"]] = list()
+            playlistSongs = playlistList[row["playlist"]]
 
             # get the artist node
             if row["artist_name"] not in playlist["artistsD"]:
@@ -71,9 +77,6 @@ def main():
                     value = int(row[key])
                 else:
                     value = row[key]
-                
-                if key == "instrumentalness":
-                    print(value)
                     
                 # populate the songs array
                 if key == "playlist":
@@ -87,6 +90,7 @@ def main():
                 if key not in ["artist_name", "album_names", "playlist"]:
                     song_entry[key] = value
             album["songs"].append(song_entry)
+            playlistSongs.append(song_entry)
             songsList.append(song_info)
 
         # count the playlist
@@ -108,8 +112,10 @@ def main():
         # export the json
         with open("dataProcessed.json", 'w', encoding='utf-8') as f:
             json.dump(resultList, f, sort_keys=True)
-        with open("dataRaw.json", 'w', encoding='utf-8') as f:
-            json.dump(songsList, f, sort_keys=True)
+        with open("dataArray.json", 'w', encoding='utf-8') as f:
+            json.dump(songsList, f , sort_keys=True)
+        with open("dataKey.json", 'w', encoding='utf-8') as f:
+            json.dump(playlistList, f, indent=4 , sort_keys=True)
 
 if __name__ == "__main__":
 	 main()

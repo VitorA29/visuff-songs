@@ -6,36 +6,15 @@
         <script src="https://cdn.jsdelivr.net/npm/vega@5.4.0"></script>
         <script src="https://cdn.jsdelivr.net/npm/vega-lite@3.3.0"></script>
         <script src="https://cdn.jsdelivr.net/npm/vega-embed@4.2.0"></script>
+        <script src="js/jquery.min.js"></script>
     </head>
     <body>
         <div id="vis"></div>
 
         <script type="text/javascript">
-            let interestingColumn = [
-                'acousticness',
-                'danceability',
-                'energy',
-                'instrumentalness',
-                'liveness',
-                'speechiness',
-                'audio_valence'
-            ];
-            let revertedColumn = interestingColumn.slice(0);
-            revertedColumn.reverse();
-
-            let columnTranslation = {
-                'acousticness': 'Grau acústico',
-                'danceability': 'Grau dançante',
-                'energy': 'Grau energético',
-                'instrumentalness': 'Grau instrumental',
-                'liveness': 'Grau ao vivo',
-                'speechiness': 'Grau de palavras',
-                'audio_valence': 'Grau emocional'
-            };
-
             let interestingPlaylist = [ 
                 'Adrenaline Workout',
-                '90s Rock Anthems',
+                'Your Favorite Coffeehouse',
                 '90s Acoustic',
                 'Acoustic Covers',
                 'Black History Salute',
@@ -46,48 +25,25 @@
                 'Piano in the Background'
             ]
 
-            let VlSpec = {
-                data: {url: 'dataset/dataRaw.json'},
-                transform: [
-                    {filter: {field: 'playlist_name', oneOf: interestingPlaylist}}
-                ],
-                repeat:{
-                    row: interestingColumn,
-                    column: revertedColumn
-                },
-                spec:{
-                    mark: 'rect',
-                    encoding: {
-                        x: {
-                            field: {repeat: 'column'},
-                            type: 'quantitative',
-                            bin: {
-                                extent: [0, 1],
-                                step: 0.1
-                            }
-                        },
-                        y: {
-                            field: {repeat: 'row'},
-                            type: 'quantitative',
-                            bin: {
-                                extent: [0, 1],
-                                step: 0.1
-                            }
-                        },
-                        color: {
-                            field: 'playlist_name',
-                            type: 'nominal'
-                        }
+            let VlSpec = (function() {
+                let json = null;
+                $.ajax({
+                    async: false,
+                    global: false,
+                    url: 'js/heatmapMatrix.json',
+                    dataType: 'json',
+                    success: function (data) {
+                        json = data;
                     }
-                },
-                config: {
-                    axis: {
-                        grid: {
-                            grid: true
-                        }
-                    }
-                }
-            };
+                });
+                return json;
+            })();
+            VlSpec.data = {url: 'dataset/dataArray.json'};
+            VlSpec.transform = [{filter: {field: 'playlist_name', oneOf: interestingPlaylist}}]
+            VlSpec.spec.encoding.color = {
+                field: 'playlist_name',
+                type: 'nominal'
+            }
             vegaEmbed('#vis', VlSpec);
           </script>
     </body>
