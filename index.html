@@ -33,12 +33,23 @@
                 'audio_valence': 'Grau emocional'
             };
 
-            let acceptPlaylist = [ 'Adrenaline Workout', 'Acoustic Hits', 'Acoustic Covers' ]
+            let interestingPlaylist = [ 
+                'Adrenaline Workout',
+                '90s Rock Anthems',
+                '90s Acoustic',
+                'Acoustic Covers',
+                'Black History Salute',
+                '80s Smash Hits',
+                'All A Cappella',
+                'Energizing Classics',
+                'Rhythm & Dance',
+                'Piano in the Background'
+            ]
 
             let VlSpec = {
                 data: {url: 'dataset/dataRaw.json'},
                 transform: [
-                    {filter: {field: 'playlist_name', oneOf: acceptPlaylist}}
+                    {filter: {field: 'playlist_name', oneOf: interestingPlaylist}}
                 ],
                 repeat:{
                     row: interestingColumn,
@@ -50,28 +61,29 @@
                         x: {
                             field: {repeat: 'column'},
                             type: 'quantitative',
-                            bin: true,
-                            axis: {
-                                title: columnTranslation[{repeat: 'column'}],
-                                grid: {
-                                    grid: true
-                                }
+                            bin: {
+                                extent: [0, 1],
+                                step: 0.1
                             }
                         },
                         y: {
                             field: {repeat: 'row'},
                             type: 'quantitative',
-                            bin: true,
-                            axis: {
-                                title: columnTranslation[{repeat: 'row'}],
-                                grid: {
-                                    grid: true
-                                }
+                            bin: {
+                                extent: [0, 1],
+                                step: 0.1
                             }
                         },
                         color: {
                             field: 'playlist_name',
                             type: 'nominal'
+                        }
+                    }
+                },
+                config: {
+                    axis: {
+                        grid: {
+                            grid: true
                         }
                     }
                 }
