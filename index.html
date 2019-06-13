@@ -7,8 +7,39 @@
         <script src="https://cdn.jsdelivr.net/npm/vega-lite@3.3.0"></script>
         <script src="https://cdn.jsdelivr.net/npm/vega-embed@4.2.0"></script>
         <script src="js/jquery.min.js"></script>
+        <script src="js/plugin/autocomplete/jquery.autocomplete.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="css/autocomplete.css">
     </head>
     <body>
+        <div>
+            <label>
+                <input type="radio" name="filterRadio" value="interestingData" onclick="filterRadioChangeEvent(this.value);" checked>
+                Interessante
+            </label>
+            <label>
+                <input type="radio" name="filterRadio" value="allData" onclick="filterRadioChangeEvent(this.value);">
+                Todos
+            </label>
+            <label>
+                <input type="radio" name="filterRadio" value="oneData" onclick="filterRadioChangeEvent(this.value);">
+                Único
+                <input type="text" name="playlist" id="autocomplete" style="display: none;"/>
+            </label>
+        </div>
+        <div>
+            <label for="groupBy">Agrupar por: </label>
+            <select name="groupBy" onchange="groupByChangeEvent(this.value);">
+                <option value="playlist" selected>Playlists</option>
+                <option value="count">Contagem</option>
+                <option value="popularity">Popularidade</option>
+                <option value="duration">Duração</option>
+                <option value="key">Tonalidade</option>
+                <option value="loudness">Intensidade</option>
+                <option value="mode">Modo(M/m)</option>
+                <option value="tempo">BPM</option>
+                <option value="signature">Compasso</option>
+            </select>
+        </div>
         <div id="vis"></div>
 
         <script type="text/javascript">
@@ -38,13 +69,98 @@
                 });
                 return json;
             })();
+
             VlSpec.data = {url: 'dataset/dataArray.json'};
             VlSpec.transform = [{filter: {field: 'playlist_name', oneOf: interestingPlaylist}}]
-            VlSpec.spec.encoding.color = {
-                field: 'playlist_name',
-                type: 'nominal'
-            }
+            VlSpec.spec.encoding.color = {field: 'playlist_name', type: 'nominal'}
             vegaEmbed('#vis', VlSpec);
-          </script>
+        </script>
+        <script>
+            var lastfilterRadio = 'interestingData';
+
+            function filterRadioChangeEvent(value) {
+                $('#autocomplete').hide();
+                $('#autocomplete').val('');
+                if (lastfilterRadio !== "" && value === lastfilterRadio){
+                    return;
+                }
+                switch(value)
+                {
+                    case 'allData':
+                        VlSpec.transform = null;
+                        break;
+                    case 'interestingData':
+                        VlSpec.transform = [{filter: {field: 'playlist_name', oneOf: interestingPlaylist}}];
+                        break;
+                    case 'oneData':
+                        $('#autocomplete').show();
+                        return;
+                }
+                lastfilterRadio = value;
+                vegaEmbed('#vis', VlSpec);
+            }
+
+            let playlistList = (function() {
+                let json = null;
+                $.ajax({
+                    async: false,
+                    global: false,
+                    url: 'dataset/dataKey.json',
+                    dataType: 'json',
+                    success: function (data) {
+                        json = data;
+                    }
+                });
+                return json;
+            })();
+
+            let lastPlaylistFilter = ""
+
+            $('#autocomplete').autocomplete({
+                lookup: playlistList,
+                onSelect: function (suggestion) {
+                    if (lastPlaylistFilter === "" || suggestion.value !== lastPlaylistFilter){
+                        VlSpec.transform = [{filter: {field: 'playlist_name', equal: suggestion.value}}];
+                        lastPlaylistFilter = suggestion.value;
+                        lastfilterRadio = 'oneData';
+                        vegaEmbed('#vis', VlSpec);
+                    }
+                }
+            });
+        </script>
+        <script>
+            function groupByChangeEvent(value){
+                switch(value){
+                    case 'playlist':
+                        VlSpec.spec.encoding.color = {field: 'playlist_name', type: 'nominal'};
+                        break;
+                    case 'count':
+                        VlSpec.spec.encoding.color = {aggregate: 'count', type: 'quantitative'};
+                        break;
+                    case 'popularity':
+                        VlSpec.spec.encoding.color = {field: 'song_popularity', type: 'quantitative'};
+                        break;
+                    case 'duration':
+                        VlSpec.spec.encoding.color = {field: 'song_duration_ms', type: 'quantitative'};
+                        break;
+                    case 'key':
+                        VlSpec.spec.encoding.color = {field: 'key', type: 'nominal'};
+                        break;
+                    case 'loudness':
+                        VlSpec.spec.encoding.color = {field: 'loudness', type: 'quantitative'};
+                        break;
+                    case 'mode':
+                        VlSpec.spec.encoding.color = {field: 'audio_mode', type: 'nominal'};
+                        break;
+                    case 'tempo':
+                        VlSpec.spec.encoding.color = {field: 'tempo', type: 'quantitative'};
+                        break;
+                    case 'signature':
+                        VlSpec.spec.encoding.color = {field: 'time_signature', type: 'nominal'};
+                        break;
+                }
+                vegaEmbed('#vis', VlSpec);
+            }
+        </script>
     </body>
 </html>
