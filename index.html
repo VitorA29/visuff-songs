@@ -20,6 +20,10 @@
                 <input type="radio" name="filterRadio" value="allData" onclick="filterRadioChangeEvent(this.value);">
                 Todos
             </label>
+            <span id="filterAllDataHolder" style="display: none;">
+                <input id="filterAllData" type="checkbox" onchange="filterAllData(this)" checked/>
+                <label for="filterAllData">filtrar</label>
+            </span>
             <label>
                 <input type="radio" name="filterRadio" value="oneData" onclick="filterRadioChangeEvent(this.value);">
                 Único
@@ -78,28 +82,6 @@
         <script>
             var lastfilterRadio = 'interestingData';
 
-            function filterRadioChangeEvent(value) {
-                $('#autocomplete').hide();
-                $('#autocomplete').val('');
-                if (lastfilterRadio !== "" && value === lastfilterRadio){
-                    return;
-                }
-                switch(value)
-                {
-                    case 'allData':
-                        VlSpec.transform = null;
-                        break;
-                    case 'interestingData':
-                        VlSpec.transform = [{filter: {field: 'playlist_name', oneOf: interestingPlaylist}}];
-                        break;
-                    case 'oneData':
-                        $('#autocomplete').show();
-                        return;
-                }
-                lastfilterRadio = value;
-                vegaEmbed('#vis', VlSpec);
-            }
-
             let playlistList = (function() {
                 let json = null;
                 $.ajax({
@@ -114,12 +96,67 @@
                 return json;
             })();
 
+            let filteredPlaylistList = playlistList.filter( e => !interestingPlaylist.includes(e) );
+
+            function filterRadioChangeEvent(value) {
+                if (lastfilterRadio !== "" && value === lastfilterRadio){
+                    switch(value)
+                    {
+                        case 'allData':
+                            $('#autocomplete').hide();
+                            $('#autocomplete').val('');
+                            return;
+                        case 'interestingData':
+                            $('#autocomplete').hide();
+                            $('#autocomplete').val('');
+                            $('#filterAllDataHolder').hide();
+                            $('#filterAllDataHolder input').prop('checked', true);
+                            return;
+                    }
+                }
+                switch(value)
+                {
+                    case 'allData':
+                        $('#autocomplete').hide();
+                        $('#autocomplete').val('');
+                        $('#filterAllDataHolder').show();
+                        VlSpec.transform = [{filter: {field: 'playlist_name', oneOf: filteredPlaylistList}}];
+                        break;
+                    case 'interestingData':
+                        $('#autocomplete').hide();
+                        $('#autocomplete').val('');
+                        $('#filterAllDataHolder').hide();
+                        $('#filterAllDataHolder input').prop('checked', true);
+                        VlSpec.transform = [{filter: {field: 'playlist_name', oneOf: interestingPlaylist}}];
+                        break;
+                    case 'oneData':
+                        $('#autocomplete').show();
+                        return;
+                }
+                lastfilterRadio = value;
+                vegaEmbed('#vis', VlSpec);
+            }
+
+            function filterAllData(element) {
+                if (element.checked)
+                {
+                    VlSpec.transform = [{filter: {field: 'playlist_name', oneOf: filteredPlaylistList}}];
+                }
+                else
+                {
+                    VlSpec.transform = null;
+                }
+                vegaEmbed('#vis', VlSpec);
+            }
+
             let lastPlaylistFilter = ""
 
             $('#autocomplete').autocomplete({
                 lookup: playlistList,
                 onSelect: function (suggestion) {
                     if (lastPlaylistFilter === "" || suggestion.value !== lastPlaylistFilter){
+                        $('#filterAllDataHolder').hide();
+                        $('#filterAllDataHolder input').prop('checked', true);
                         VlSpec.transform = [{filter: {field: 'playlist_name', equal: suggestion.value}}];
                         lastPlaylistFilter = suggestion.value;
                         lastfilterRadio = 'oneData';

@@ -64,6 +64,8 @@ def main():
             json.dump(songsList, f , sort_keys=True)
         with open("dataKey.json", 'w', encoding='utf-8') as f:
             json.dump(playlistList, f, sort_keys=True)
+        print("Number of entries: " + str(len(songsList)))
+        print("Number of playlists: " + str(len(playlistList)))
 
 if __name__ == "__main__":
 	 main()
