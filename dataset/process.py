@@ -29,11 +29,12 @@ def main():
             playlist_details = csv.DictReader(playlist_details_file)
             # join the tables
             table = list()
-            for data in song_details:
-                for more_data in playlist_details:
+            for more_data in playlist_details:
+                for data in song_details:
                     if more_data["song_name"] == data["song_name"]:
-                        data.update(more_data)
-                        table.append(data.copy())
+                        dataCopy = data.copy()
+                        dataCopy.update(more_data)
+                        table.append(dataCopy)
                         break
         # create the result dict
         songs_set = set()
