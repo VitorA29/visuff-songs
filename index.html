@@ -47,18 +47,20 @@
         <div id="vis"></div>
 
         <script type="text/javascript">
-            let interestingPlaylist = [ 
-                'Adrenaline Workout',
-                'Your Favorite Coffeehouse',
-                '90s Acoustic',
-                'Acoustic Covers',
-                'Black History Salute',
-                '80s Smash Hits',
-                'All A Cappella',
-                'Energizing Classics',
-                'Rhythm & Dance',
-                'Piano in the Background'
-            ]
+            let mayBeInterestingPlaylist = [];
+
+            let interestingPlaylist = [
+                "Adrenaline Workout",
+                "Trap Instrumental Beats",
+                "Lush Lofi",
+                "Tender",
+                "The Piano Lounge",
+                "The Most Beautiful Songs in the World",
+                "Warrior Workout",
+                "Your Favorite Coffeehouse",
+                "Young & Free",
+                "Workout Twerkout",
+            ];
 
             let VlSpec = (function() {
                 let json = null;
@@ -96,7 +98,7 @@
                 return json;
             })();
 
-            let filteredPlaylistList = playlistList.filter( e => !interestingPlaylist.includes(e) );
+            let filteredPlaylistList = playlistList.filter( e => !interestingPlaylist.includes(e) && !mayBeInterestingPlaylist.includes(e) );
 
             function filterRadioChangeEvent(value) {
                 if (lastfilterRadio !== "" && value === lastfilterRadio){

@@ -36,6 +36,7 @@ def main():
                         table.append(data.copy())
                         break
         # create the result dict
+        songs_set = set()
         songsList = list()
         playlistList = list()
         for row in table:
@@ -56,6 +57,8 @@ def main():
                     
                 # populate the songs array
                 if key not in [ "artist_name", "album_name" ]:
+                    if key == "song_name":
+                        songs_set.add(value+"-"+row["artist_name"]+"-"+row["album_name"])
                     song_info[key] = value
             songsList.append(song_info)
 
@@ -65,6 +68,7 @@ def main():
         with open("dataKey.json", 'w', encoding='utf-8') as f:
             json.dump(playlistList, f, sort_keys=True)
         print("Number of entries: " + str(len(songsList)))
+        print("Number of unique entries: " + str(len(songs_set)))
         print("Number of playlists: " + str(len(playlistList)))
 
 if __name__ == "__main__":
